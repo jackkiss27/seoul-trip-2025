@@ -359,6 +359,8 @@
                                 if(d.itineraryDays)itineraryDays.value=typeof d.itineraryDays==='string'?JSON.parse(d.itineraryDays):d.itineraryDays;
                                 if(d.expenses)expenses.value=typeof d.expenses==='string'?JSON.parse(d.expenses):d.expenses;
                                 if(d.checkList)checkList.value=d.checkList; if(d.memoText)memoText.value=d.memoText; if(d.travelers)travelers.value=d.travelers;
+                                // BUG FIX: Read exchange rate from cloud
+                                if(d.exchangeRate) exchangeRate.value = d.exchangeRate;
                                 isCloud.value=true; nextTick(()=>isRemoteUpdate.value=false);
                             }else{ saveData(); isCloud.value=true; }
                         });
@@ -426,7 +428,16 @@
                 onMounted(()=>{
                     fetchWeather();
                     const s=localStorage.getItem('seoulTripData_v25');
-                    if(s){const d=JSON.parse(s);itineraryDays.value=d.itineraryDays;expenses.value=d.expenses;checkList.value=d.checkList||checkList.value;memoText.value=d.memoText||"";travelers.value=d.travelers||travelers.value}
+                    if(s){
+                        const d=JSON.parse(s);
+                        itineraryDays.value=d.itineraryDays;
+                        expenses.value=d.expenses;
+                        checkList.value=d.checkList||checkList.value;
+                        memoText.value=d.memoText||"";
+                        travelers.value=d.travelers||travelers.value;
+                        // BUG FIX: Read exchange rate from local storage
+                        if(d.exchangeRate) exchangeRate.value = d.exchangeRate;
+                    }
                     const c=localStorage.getItem('user_firebase_config');
                     if(c){firebaseConfigInput.value=c;const wait=setInterval(()=>{if(window.FS){clearInterval(wait);connectCloud()}},100)}
                 });
